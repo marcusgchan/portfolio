@@ -1,46 +1,60 @@
 import { useState } from "react";
 import "./App.css";
+import * as THREE from "three";
 
 /* https://docs.pmnd.rs/react-three-fiber/getting-started/introduction */
-import { Canvas, GroupProps } from "@react-three/fiber";
+import { Canvas, GroupProps, useFrame, useThree } from "@react-three/fiber";
 import { BBAnchor, OrbitControls, Stage, useGLTF } from "@react-three/drei";
 
 function App() {
   const [display3dScene, setDisplay3dScene] = useState(false);
   const toggleDisplay3dScene = () => setDisplay3dScene((ds) => !ds);
+
   return (
     <div className="flex flex-col h-full p-6 relative">
       <Hero toggleDisplay3dScene={toggleDisplay3dScene} />
-      <div
-        className={`${
-          display3dScene ? "top-0" : "top-full"
-        } absolute left-0 h-full w-full transition-all bg-sky-400`}
-      >
+      <div className={`absolute left-0 h-full w-full transition-all`}>
         <Nav toggleDisplay3dScene={toggleDisplay3dScene} />
-        <Canvas shadows camera={{ position: [4, 3, 8], fov: 35 }}>
-          <Stage
-            intensity={0.5}
-            adjustCamera
-            preset="rembrandt"
-            environment="city"
-            shadows={{
-              type: "accumulative",
-              color: "skyblue",
-              colorBlend: 2,
-              opacity: 2,
-            }}
-          >
-            <Desk scale={[1, 1, 1]} rotation-y={Math.PI * 0.5} />
-            <Laptop position={[0, 6.9, 0]} scale={[1.5, 1.5, 1.5]}/>
-          </Stage>
-          <OrbitControls
-            minPolarAngle={0}
-            maxPolarAngle={Math.PI / 1.9}
-            makeDefault
-          />
+        <Canvas shadows camera={{ position: [0, 2, 9], fov: 35 }}>
+          <Scene />
         </Canvas>
       </div>
     </div>
+  );
+}
+
+function Scene() {
+  const camera = useThree((three) => three.camera);
+  
+  useFrame(() => {
+    //camera.translateZ(10);
+    //camera.updateProjectionMatrix();
+  });
+  return (
+    <>
+      <Stage
+        intensity={0.5}
+        //adjustCamera
+        preset="rembrandt"
+        environment="city"
+        shadows={{
+          type: "accumulative",
+          //color: "skyblue",
+          colorBlend: 2,
+          opacity: 2,
+        }}
+      >
+        <Desk scale={[1, 1, 1]} rotation-y={Math.PI * 0.5} />
+        <Laptop position={[0, 6.9, 0]} scale={[1.5, 1.5, 1.5]} />
+      </Stage>
+      <OrbitControls
+        //enableZoom={false}
+        //enableDamping={false}
+        //minPolarAngle={0}
+        //maxPolarAngle={Math.PI / 1.9}
+        makeDefault
+      />
+    </>
   );
 }
 
