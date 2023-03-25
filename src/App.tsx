@@ -5,7 +5,7 @@ import * as THREE from "three";
 /* https://docs.pmnd.rs/react-three-fiber/getting-started/introduction */
 import { Canvas, GroupProps, useFrame, useThree } from "@react-three/fiber";
 import { BBAnchor, OrbitControls, Stage, useGLTF } from "@react-three/drei";
-import { useViewStates } from "./gameStateStore";
+import { useViewStates } from "./viewStateStore";
 
 function App() {
   const [display3dScene, setDisplay3dScene] = useState(false);
