@@ -4,7 +4,14 @@ import * as THREE from "three";
 
 /* https://docs.pmnd.rs/react-three-fiber/getting-started/introduction */
 import { Canvas, GroupProps, useFrame, useThree } from "@react-three/fiber";
-import { BBAnchor, OrbitControls, Stage, useGLTF } from "@react-three/drei";
+import {
+  BBAnchor,
+  Center,
+  OrbitControls,
+  Stage,
+  Text3D,
+  useGLTF,
+} from "@react-three/drei";
 import { useViewStates } from "./viewStateStore";
 
 function App() {
@@ -21,8 +28,16 @@ function App() {
         } left-0 h-full w-full transition-all`}
       >
         <Nav toggleDisplay3dScene={toggleDisplay3dScene} />
-        <Canvas shadows camera={{ position: [0, 0.5, 2], fov: 35 }}>
+        <Canvas shadows camera={{}}>
+          <mesh position-y="2">
+            <boxGeometry args={[1, 1, 1]} />
+            <meshStandardMaterial color={"red"} />
+          </mesh>
+
           <Scene />
+
+          <fog color={0x111111} />
+          <ambientLight intensity={0.5} color="white" />
         </Canvas>
       </div>
     </div>
@@ -39,6 +54,7 @@ function Scene() {
   const totalTime = 0.3 * 1000;
   const startingZoom = camera.zoom;
   useFrame(() => {
+    /*
     if (laptopRef.current) {
       if (view !== "PROJECTS") {
         camera.lookAt(laptopRef.current?.position);
@@ -51,7 +67,32 @@ function Scene() {
         camera.updateProjectionMatrix();
       }
     }
+    */
   });
+  return (
+    <>
+      <Bio />
+    </>
+  );
+}
+
+function Bio() {
+  return (
+    <>
+      <Center>
+        <Text3D
+          size={0.1}
+          height={0.1}
+          font="/Roboto_Regular.json"
+        >{`Test`}</Text3D>
+        <meshStandardMaterial color="blue" />
+      </Center>
+      <OrbitControls />
+    </>
+  );
+}
+
+function DeskSetup() {
   return (
     <>
       <Stage
