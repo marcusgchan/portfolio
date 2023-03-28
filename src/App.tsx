@@ -7,7 +7,7 @@ import {
 } from "react";
 import "./App.css";
 import * as THREE from "three";
-
+import colors from "tailwindcss/colors";
 /* https://docs.pmnd.rs/react-three-fiber/getting-started/introduction */
 import { Canvas, GroupProps, useFrame, useThree } from "@react-three/fiber";
 import {
@@ -40,9 +40,28 @@ function App() {
         <Canvas shadows camera={{ position: [0, 1.5, 5], zoom: 1, fov: 75 }}>
           <Scene />
           <color attach="background" args={["#27272a"]} />
-          <fogExp2 color="#27272a" density={0.02} attach="fog" />
+          <fogExp2 color="#27272a" density={0.2} attach="fog" />
           <ambientLight intensity={0.5} color="white" />
         </Canvas>
+      </div>
+      <Overlay />
+    </div>
+  );
+}
+
+function Overlay() {
+  return (
+    <div className="fixed inset-0">
+      <div className="absolute right-[10%] bottom-56 flex flex-col md:flex-row gap-14">
+        <button className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]">
+          Explore
+        </button>
+        <button className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]">
+          Contact
+        </button>
+        <button className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]">
+          Download Resume
+        </button>
       </div>
     </div>
   );
@@ -58,10 +77,10 @@ function Scene() {
   const totalTime = 0.3 * 1000;
   const startingZoom = camera.zoom;
   const { width, height } = useThree((state) => state.viewport);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 812);
-  const margin = isMobile ? 0.4 : 1;
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const margin = isMobile ? 0.4 : 0.9;
   useLayoutEffect(() => {
-    const handleResize = () => setIsMobile(() => window.innerWidth < 812);
+    const handleResize = () => setIsMobile(() => window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -84,18 +103,18 @@ function Scene() {
   if (view === "HOME") {
     return (
       <>
-        <Float rotationIntensity={0.5}>
+        <Float rotationIntensity={0.7}>
           <Center right position={[-width / 2 + margin, 0, 0]}>
             <group>
               <Text3D
                 rotation={[-0.1, 0.3, 0]}
-                letterSpacing={0.02}
+                letterSpacing={0.03}
                 curveSegments={32}
                 bevelEnabled
                 lineHeight={0.8}
                 bevelSize={0.04}
                 bevelThickness={0.1}
-                size={isMobile ? 0.2 : 0.5}
+                size={isMobile ? 0.2 : 0.4}
                 height={0.1}
                 font="/Roboto_Regular.json"
               >
