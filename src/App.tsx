@@ -23,6 +23,7 @@ import {
 } from "@react-three/drei";
 import { useViewStates } from "./viewStateStore";
 import { BoxGeometry } from "three";
+import { motion } from "framer-motion";
 
 function App() {
   const [display3dScene, setDisplay3dScene] = useState(false);
@@ -33,7 +34,7 @@ function App() {
     <div className="flex max-w-7xl mx-auto flex-col h-full p-6 relative text-white">
       <div
         className={`absolute ${
-          view === "HOME" ? "-z-10" : "z-10"
+          view !== "PROJECTS" ? "-z-10" : "z-10"
         } left-0 top-0 h-full w-full transition-all`}
       >
         {/*<Nav toggleDisplay3dScene={toggleDisplay3dScene} /> */}
@@ -44,16 +45,91 @@ function App() {
           <ambientLight intensity={0.5} color="white" />
         </Canvas>
       </div>
-      <Overlay />
+      <OverlayWrapper>
+        <Overlay />
+      </OverlayWrapper>
     </div>
   );
 }
 
+function OverlayWrapper({ children }: { children: React.ReactNode }) {
+  return <div className="fixed inset-0">{children}</div>;
+}
+
 function Overlay() {
+  const view = useViewStates((state) => state.view);
+  const updateView = useViewStates((state) => state.updateView);
   return (
-    <div className="fixed inset-0">
-      <div className="absolute right-[10%] bottom-[10%] flex flex-col md:flex-row gap-14">
-        <button className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]">
+    <>
+      <Home />;
+      <motion.div
+        initial={false}
+        animate={
+          view === "ABOUT"
+            ? { right: "10%", translateX: "0", opacity: 1 }
+            : { right: "0%", translateX: "100%", opacity: 0 }
+        }
+        
+        className="absolute bottom-[10%] flex flex-col max-w-lg gap-4 tracking-wide"
+      >
+        <p>
+          Hello, I’m Marcus and I am studying Computer Science - Software
+          Systems at SFU. My passion lies in web development, and I've been
+          honing my skills in this area for some time now. In 2022, I joined
+          WelTel Health as a fullstack developer intern and had the opportunity
+          to improve after clinic healthcare through fixing bugs and developing
+          features. One of my main takeaways was learning how to work in a large
+          code base.
+        </p>
+        <p>
+          My favourite tech stack is the T3 Stack that focuses on fullstack type
+          safety for web development. This stack has tremendously improved my
+          productivity and has best in class developer experience. Additionally,
+          I've recently been exploring the possibilities of WebXR and WebGL,
+          which I find to be fascinating technologies that offer new and
+          exciting ways to create immersive web experiences.
+        </p>
+        <p>
+          Overall, I am passionate about software development and excited to
+          continue learning and growing in this field.
+        </p>
+        <div className="flex gap-14">
+          <button
+            onClick={() => updateView("HOME")}
+            className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
+          >
+            Back
+          </button>
+          <button
+            onClick={() => updateView("PROJECTS")}
+            className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
+          >
+            Explore
+          </button>
+        </div>
+      </motion.div>
+    </>
+  );
+}
+
+function Home() {
+  const updateView = useViewStates((state) => state.updateView);
+  const view = useViewStates((state) => state.view);
+  return (
+    <>
+      <motion.div
+        initial={false}
+        animate={
+          view === "HOME"
+            ? { right: "10%", opacity: 1 }
+            : { right: "100%", opacity: 1 }
+        }
+        className="absolute bottom-[10%] flex flex-col md:flex-row gap-14"
+      >
+        <button
+          onClick={() => updateView("ABOUT")}
+          className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
+        >
           Explore
         </button>
         <button className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]">
@@ -62,15 +138,14 @@ function Overlay() {
         <button className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]">
           Download Resume
         </button>
-      </div>
-    </div>
+      </motion.div>
+    </>
   );
 }
 
 function Scene() {
   const camera = useThree((three) => three.camera);
   const laptopRef = createRef<THREE.Group>();
-  const { view } = useViewStates((state) => state);
   const minZoom = 1;
   const maxZoom = 7;
   const startTime = Date.now();
@@ -78,6 +153,7 @@ function Scene() {
   const startingZoom = camera.zoom;
   const { width, height } = useThree((state) => state.viewport);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const view = useViewStates((state) => state.view);
   const margin = isMobile ? 0.4 : 0.9;
   useLayoutEffect(() => {
     const handleResize = () => setIsMobile(() => window.innerWidth < 768);
@@ -100,70 +176,34 @@ function Scene() {
     }
     */
   });
-  if (view === "HOME") {
-    return (
-      <>
-        <Float rotationIntensity={0.7}>
-          <Center right position={[-width / 2 + margin, 0, 0]}>
-            <group>
-              <Text3D
-                rotation={[-0.1, 0.3, 0]}
-                letterSpacing={0.03}
-                curveSegments={32}
-                bevelEnabled
-                lineHeight={0.8}
-                bevelSize={0.04}
-                bevelThickness={0.1}
-                size={isMobile ? 0.2 : 0.4}
-                height={0.1}
-                font="/Roboto_Regular.json"
-              >
-                {`Hi, my name\nis Marcus`}
-                <meshNormalMaterial />
-              </Text3D>
-            </group>
-          </Center>
-        </Float>
-        <Center position={[0, -1, -2.5]}>
-          <DeskSetup />
-        </Center>
-      </>
-    );
-  }
-  if (view === "ABOUT") {
-    return (
-      <>
-        <Bio />
-      </>
-    );
-  }
-  return null;
-}
-
-function Bio() {
-  const title = "Bio\n";
-  const para1 =
-    "Hello, I’m Marcus and I am studying Computer Science - Software Systems at SFU.\nMy passion lies in web development, and I've been honing my skills in\nthis area for some time now. In 2022, I joined WelTel Health as a fullstack developer\nintern and had the opportunity to improve after clinic healthcare\nthrough fixing bugs and developing features.\nOne of my main takeaways was learning how to work in a large code base.";
   return (
     <>
-      <Float rotationIntensity={0.2}>
-        <Center>
-          <Text3D
-            letterSpacing={0.02}
-            size={0.2}
-            height={0.1}
-            font="/Roboto_Regular.json"
-          >
-            {title}
-            {para1}
-            <meshStandardMaterial color={"#c7d2fe"} />
-          </Text3D>
+      <Float rotationIntensity={0.7}>
+        <Center right position={[-width / 2 + margin, 0, 0]}>
+            <Text3D
+              rotation={[-0.1, 0.3, 0]}
+              letterSpacing={0.03}
+              curveSegments={32}
+              bevelEnabled
+              lineHeight={0.8}
+              bevelSize={0.04}
+              bevelThickness={0.1}
+              size={isMobile ? 0.2 : 0.4}
+              height={0.1}
+              font="/Roboto_Regular.json"
+            >
+              {`Hi, my name\nis Marcus`}
+              <meshNormalMaterial />
+            </Text3D>
         </Center>
       </Float>
-      <OrbitControls />
+      <Center position={[0, -1, -2.5]}>
+        <DeskSetup />
+      </Center>
     </>
   );
 }
+
 function DeskSetup(props: GroupProps) {
   return (
     <group {...props} scale={[0.3, 0.3, 0.3]}>
@@ -202,31 +242,6 @@ function Nav({ toggleDisplay3dScene }: { toggleDisplay3dScene: () => void }) {
         </li>
       </ul>
     </nav>
-  );
-}
-
-function Hero() {
-  const { updateView, view } = useViewStates((state) => state);
-  if (view !== "HOME") return null;
-  return (
-    <section className="h-full flex items-center">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-4xl">Hello, my name is Marcus</h1>
-        <p className="text-lg">I am a fullstack developer studying at SFU</p>
-        <ul className="flex flex-wrap gap-2 text-base">
-          <li>
-            <button>Download Resume</button>
-          </li>
-          <li>
-            <button onClick={() => updateView("ABOUT")}>Explore</button>
-          </li>
-          <li>
-            <button>Contact</button>
-          </li>
-        </ul>
-        {/* Add github and linked in links or when hit contact pop modal? */}
-      </div>
-    </section>
   );
 }
 
@@ -434,3 +449,5 @@ const Laptop = forwardRef(function Laptop(
 });
 
 export default App;
+useGLTF.preload("./laptop.gltf");
+useGLTF.preload("./table.glb");
