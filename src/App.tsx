@@ -30,7 +30,7 @@ function App() {
   const { view } = useViewStates((state) => state);
 
   return (
-    <div className="flex flex-col h-full p-6 relative text-white">
+    <div className="flex max-w-7xl mx-auto flex-col h-full p-6 relative text-white">
       <div
         className={`absolute ${
           view === "HOME" ? "-z-10" : "z-10"
@@ -52,7 +52,7 @@ function App() {
 function Overlay() {
   return (
     <div className="fixed inset-0">
-      <div className="absolute right-[10%] bottom-56 flex flex-col md:flex-row gap-14">
+      <div className="absolute right-[10%] bottom-[10%] flex flex-col md:flex-row gap-14">
         <button className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]">
           Explore
         </button>
