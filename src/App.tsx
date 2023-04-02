@@ -28,10 +28,7 @@ import { BoxGeometry, Vector3 } from "three";
 import { motion } from "framer-motion";
 
 function App() {
-  const [display3dScene, setDisplay3dScene] = useState(false);
-  const toggleDisplay3dScene = () => setDisplay3dScene((ds) => !ds);
   const { view } = useViewStates((state) => state);
-
   return (
     <div className="flex max-w-7xl mx-auto flex-col h-full p-6 relative text-white">
       <div
@@ -146,46 +143,30 @@ function Home() {
   );
 }
 
-type Distance = "CLOSE" | "FAR";
-
 function Scene() {
-  const camera = useThree((three) => three.camera);
   const view = useViewStates((state) => state.view);
   const deskRef = createRef<THREE.Group>();
-  const farZPosition = -2.5;
-  const closeZPosition = 3.5;
-  const startTime = Date.now();
+  let startTime: null | number = null;
   const totalTime = 2 * 1000;
-  const viewConfig: {[key: string]: Distance} = {
-    home: "FAR",
-    about: "FAR",
-    projects: "CLOSE", 
-  }
-  let currentDeskDistance: Distance = "FAR";
+  const viewConfig: { [key: string]: Vector3 } = {
+    home: new THREE.Vector3(0, -1, -2.5),
+    about: new THREE.Vector3(0, -1, -2.5),
+    projects: new THREE.Vector3(0, 0, 3.5),
+  };
   useFrame(() => {
     if (deskRef.current) {
-      const targetDistance = viewConfig[view.toLowerCase()];
-      if (currentDeskDistance !== targetDistance && view === "PROJECTS") {
-        const elapsedTime = Date.now() - startTime;
-        const progress = Math.min(1, elapsedTime / totalTime);
-        if (progress === 1) {
-          deskRef.current.position.setZ(closeZPosition);
-          currentDeskDistance = true;
-        } else {
-          const calc =
-            farZPosition - (farZPosition - closeZPosition) * progress;
-          deskRef.current.position.setZ(calc);
+      let currentDeskDistance = deskRef.current.position;
+      const targetPosition = viewConfig[view.toLowerCase()];
+      if (!currentDeskDistance.equals(targetPosition)) {
+        if (startTime === null) {
+          startTime = Date.now();
         }
-      } else if (currentDeskDistance && view !== "PROJECTS") {
         const elapsedTime = Date.now() - startTime;
         const progress = Math.min(1, elapsedTime / totalTime);
+        console.log(progress);
+        deskRef.current.position.lerp(targetPosition, progress);
         if (progress === 1) {
-          deskRef.current.position.setZ(farZPosition);
-          currentDeskDistance = false;
-        } else {
-          const calc =
-            closeZPosition + (closeZPosition - farZPosition) * progress;
-          deskRef.current.position.setZ(calc);
+          startTime = null;
         }
       }
     }
@@ -194,7 +175,7 @@ function Scene() {
     <>
       <HandleHeadings />
       <Center ref={deskRef} position={[0, -1, -2.5]}>
-        <DeskSetup  />
+        <DeskSetup />
       </Center>
     </>
   );
