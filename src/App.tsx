@@ -1,5 +1,6 @@
 import {
   createRef,
+  ForwardedRef,
   forwardRef,
   useLayoutEffect,
   useRef,
@@ -15,6 +16,7 @@ import {
   Center,
   Float,
   Html,
+  Loader,
   OrbitControls,
   Stage,
   Text3D,
@@ -22,7 +24,7 @@ import {
   useMatcapTexture,
 } from "@react-three/drei";
 import { useViewStates } from "./viewStateStore";
-import { BoxGeometry } from "three";
+import { BoxGeometry, Vector3 } from "three";
 import { motion } from "framer-motion";
 
 function App() {
@@ -37,7 +39,6 @@ function App() {
           view !== "PROJECTS" ? "-z-10" : "z-10"
         } left-0 top-0 h-full w-full transition-all`}
       >
-        {/*<Nav toggleDisplay3dScene={toggleDisplay3dScene} /> */}
         <Canvas shadows camera={{ position: [0, 1.5, 5], zoom: 1, fov: 75 }}>
           <Scene />
           <color attach="background" args={["#27272a"]} />
@@ -48,6 +49,7 @@ function App() {
       <OverlayWrapper>
         <Overlay />
       </OverlayWrapper>
+      <Loader />
     </div>
   );
 }
@@ -61,7 +63,7 @@ function Overlay() {
   const updateView = useViewStates((state) => state.updateView);
   return (
     <>
-      <Home />;
+      <Home />
       <motion.div
         initial={false}
         animate={
@@ -69,42 +71,43 @@ function Overlay() {
             ? { right: "10%", translateX: "0", opacity: 1 }
             : { right: "0%", translateX: "100%", opacity: 0 }
         }
-        
-        className="absolute bottom-[10%] flex flex-col max-w-lg gap-4 tracking-wide"
+        className="absolute p-2 bottom-[10%] ml-[10%] flex flex-col max-w-lg gap-4 tracking-wide"
       >
-        <p>
-          Hello, I’m Marcus and I am studying Computer Science - Software
-          Systems at SFU. My passion lies in web development, and I've been
-          honing my skills in this area for some time now. In 2022, I joined
-          WelTel Health as a fullstack developer intern and had the opportunity
-          to improve after clinic healthcare through fixing bugs and developing
-          features. One of my main takeaways was learning how to work in a large
-          code base.
-        </p>
-        <p>
-          My favourite tech stack is the T3 Stack that focuses on fullstack type
-          safety for web development. This stack has tremendously improved my
-          productivity and has best in class developer experience. Additionally,
-          I've recently been exploring the possibilities of WebXR and WebGL,
-          which I find to be fascinating technologies that offer new and
-          exciting ways to create immersive web experiences.
-        </p>
-        <p>
-          Overall, I am passionate about software development and excited to
-          continue learning and growing in this field.
-        </p>
-        <div className="flex gap-14">
+        <div className="flex flex-col gap-4 overflow-auto max-h-[50vh] md:max-h-none">
+          <p>
+            Hello, I’m Marcus and I am studying Computer Science - Software
+            Systems at SFU. My passion lies in web development, and I've been
+            honing my skills in this area for some time now. In 2022, I joined
+            WelTel Health as a fullstack developer intern and had the
+            opportunity to improve after clinic healthcare through fixing bugs
+            and developing features. One of my main takeaways was learning how
+            to work in a large code base.
+          </p>
+          <p>
+            My favourite tech stack is the T3 Stack that focuses on fullstack
+            type safety for web development. This stack has tremendously
+            improved my productivity and has best in class developer experience.
+            Additionally, I've recently been exploring the possibilities of
+            WebXR and WebGL, which I find to be fascinating technologies that
+            offer new and exciting ways to create immersive web experiences.
+          </p>
+          <p>
+            Overall, I am passionate about software development and excited to
+            continue learning and growing in this field.
+          </p>
+        </div>
+        <div className="flex gap-3 md:gap-14">
           <button
             onClick={() => updateView("HOME")}
-            className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
+            className="p-2 w-[140px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
           >
             Back
           </button>
           <button
             onClick={() => updateView("PROJECTS")}
-            className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
+            className="p-2 w-[140px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
           >
-            Explore
+            Projects
           </button>
         </div>
       </motion.div>
@@ -143,75 +146,130 @@ function Home() {
   );
 }
 
+type Distance = "CLOSE" | "FAR";
+
 function Scene() {
   const camera = useThree((three) => three.camera);
-  const laptopRef = createRef<THREE.Group>();
-  const minZoom = 1;
-  const maxZoom = 7;
-  const startTime = Date.now();
-  const totalTime = 0.3 * 1000;
-  const startingZoom = camera.zoom;
-  const { width, height } = useThree((state) => state.viewport);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const view = useViewStates((state) => state.view);
-  const margin = isMobile ? 0.4 : 0.9;
-  useLayoutEffect(() => {
-    const handleResize = () => setIsMobile(() => window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const deskRef = createRef<THREE.Group>();
+  const farZPosition = -2.5;
+  const closeZPosition = 3.5;
+  const startTime = Date.now();
+  const totalTime = 2 * 1000;
+  const viewConfig: {[key: string]: Distance} = {
+    home: "FAR",
+    about: "FAR",
+    projects: "CLOSE", 
+  }
+  let currentDeskDistance: Distance = "FAR";
   useFrame(() => {
-    /*
-    if (laptopRef.current) {
-      if (view !== "PROJECTS") {
-        camera.lookAt(laptopRef.current?.position);
-        camera.zoom = maxZoom;
-        camera.updateProjectionMatrix();
-      } else {
+    if (deskRef.current) {
+      const targetDistance = viewConfig[view.toLowerCase()];
+      if (currentDeskDistance !== targetDistance && view === "PROJECTS") {
         const elapsedTime = Date.now() - startTime;
         const progress = Math.min(1, elapsedTime / totalTime);
-        camera.zoom = startingZoom - progress * (maxZoom - minZoom);
-        camera.updateProjectionMatrix();
+        if (progress === 1) {
+          deskRef.current.position.setZ(closeZPosition);
+          currentDeskDistance = true;
+        } else {
+          const calc =
+            farZPosition - (farZPosition - closeZPosition) * progress;
+          deskRef.current.position.setZ(calc);
+        }
+      } else if (currentDeskDistance && view !== "PROJECTS") {
+        const elapsedTime = Date.now() - startTime;
+        const progress = Math.min(1, elapsedTime / totalTime);
+        if (progress === 1) {
+          deskRef.current.position.setZ(farZPosition);
+          currentDeskDistance = false;
+        } else {
+          const calc =
+            closeZPosition + (closeZPosition - farZPosition) * progress;
+          deskRef.current.position.setZ(calc);
+        }
       }
     }
-    */
   });
   return (
     <>
-      <Float rotationIntensity={0.7}>
-        <Center right position={[-width / 2 + margin, 0, 0]}>
-            <Text3D
-              rotation={[-0.1, 0.3, 0]}
-              letterSpacing={0.03}
-              curveSegments={32}
-              bevelEnabled
-              lineHeight={0.8}
-              bevelSize={0.04}
-              bevelThickness={0.1}
-              size={isMobile ? 0.2 : 0.4}
-              height={0.1}
-              font="/Roboto_Regular.json"
-            >
-              {`Hi, my name\nis Marcus`}
-              <meshNormalMaterial />
-            </Text3D>
-        </Center>
-      </Float>
-      <Center position={[0, -1, -2.5]}>
-        <DeskSetup />
+      <HandleHeadings />
+      <Center ref={deskRef} position={[0, -1, -2.5]}>
+        <DeskSetup  />
       </Center>
     </>
   );
 }
 
-function DeskSetup(props: GroupProps) {
+function HandleHeadings() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  useLayoutEffect(() => {
+    const handleResize = () => setIsMobile(() => window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  const homeMargin = isMobile ? 0.8 : 1.5;
+  const view = useViewStates((state) => state.view);
+  const { width, height } = useThree((state) => state.viewport);
+  const positionBasedOnView = {
+    home: new THREE.Vector3(-width / 2 + homeMargin, 1, 0),
+    about: new THREE.Vector3(-width / 2 + 0.9, height / 2 - 1.5, 0),
+  };
+  const textBasedOnView = {
+    home: `Hi, my name\nis Marcus`,
+    about: `Bio`,
+  };
+  const textBaseConfig = {
+    rotation: new THREE.Euler(-0.1, 0.3, 0),
+    letterSpacing: 0.03,
+    curveSegments: 32,
+    bevelEnabled: true,
+    lineHeight: 0.8,
+    bevelThickness: 0.1,
+    height: 0.1,
+    font: "/Roboto_Regular.json",
+  };
+  if (view === "HOME") {
+    return (
+      <>
+        <Float rotationIntensity={0.0}>
+          <Center right position={positionBasedOnView.home}>
+            <Text3D size={isMobile ? 0.4 : 0.5} {...textBaseConfig}>
+              {textBasedOnView.home}
+              <meshNormalMaterial />
+            </Text3D>
+          </Center>
+        </Float>
+      </>
+    );
+  }
+  if (view === "ABOUT") {
+    return (
+      <>
+        <Float rotationIntensity={0.5}>
+          <Center bottom right position={positionBasedOnView.about}>
+            <Text3D {...textBaseConfig} size={0.5}>
+              {textBasedOnView.about}
+              <meshNormalMaterial />
+            </Text3D>
+          </Center>
+        </Float>
+      </>
+    );
+  }
+  return null;
+}
+
+const DeskSetup = forwardRef(function DeskSetup(
+  props: GroupProps,
+  ref: ForwardedRef<THREE.Group>
+) {
   return (
-    <group {...props} scale={[0.3, 0.3, 0.3]}>
+    <group ref={ref} {...props} scale={[0.3, 0.3, 0.3]}>
       <Desk scale={[1, 1, 1]} rotation-y={Math.PI * 0.5} />
       <Laptop position={[0, 6.9, 0]} scale={[1.5, 1.5, 1.5]} />
     </group>
   );
-}
+});
 
 /*
   Auto-generated by: https://github.com/pmndrs/gltfjsx
