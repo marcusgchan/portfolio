@@ -171,7 +171,6 @@ function Scene() {
       const distance = currentPosition.distanceTo(targetPosition);
       if (distance > 0.0001) {
         if (!clockRef.current.running) {
-          console.log("STarting Clock");
           clockRef.current.start();
         }
         const elapsedTime = clockRef.current.getElapsedTime();
@@ -181,9 +180,7 @@ function Scene() {
           targetPosition,
           progress
         );
-        console.log(progress);
         if (progress === 1) {
-          console.log("stopping clock");
           clockRef.current.stop();
           deskRef.current.position.set(
             targetPosition.x,
@@ -192,7 +189,6 @@ function Scene() {
           );
         }
       } else if (clockRef.current.running) {
-        console.log("Stop clock");
         clockRef.current.stop();
       }
     }
@@ -215,11 +211,12 @@ function HandleHeadings() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   const homeMargin = isMobile ? 0.8 : 1.5;
+  const aboutMargin = isMobile ? 0.9 : 2;
   const view = useViewStates((state) => state.view);
   const { width, height } = useThree((state) => state.viewport);
   const positionBasedOnView = {
     home: new THREE.Vector3(-width / 2 + homeMargin, 1, 0),
-    about: new THREE.Vector3(-width / 2 + 0.9, height / 2 - 1.5, 0),
+    about: new THREE.Vector3(-width / 2 + aboutMargin, height / 2 - aboutMargin - 0.5, 0),
   };
   const textBasedOnView = {
     home: `Hi, my name\nis Marcus`,
@@ -252,7 +249,7 @@ function HandleHeadings() {
   if (view === "ABOUT") {
     return (
       <>
-        <Float rotationIntensity={0.5}>
+        <Float rotationIntensity={0.0}>
           <Center bottom right position={positionBasedOnView.about}>
             <Text3D {...textBaseConfig} size={0.5}>
               {textBasedOnView.about}
@@ -270,10 +267,26 @@ const DeskSetup = forwardRef(function DeskSetup(
   props: GroupProps,
   ref: ForwardedRef<THREE.Group>
 ) {
+  const view = useViewStates((state) => state.view);
+  console.log(view)
   return (
     <group ref={ref} {...props} scale={[0.3, 0.3, 0.3]}>
       <Desk scale={[1, 1, 1]} rotation-y={Math.PI * 0.5} />
-      <Laptop position={[0, 6.9, 0]} scale={[1.5, 1.5, 1.5]} />
+      <Laptop position={[0, 6.9, 2]} scale={[1.5, 1.5, 1.5]}>
+        {view === "PROJECTS" && (
+          <Html
+            rotation-x={Math.PI * -0.085}
+            position={[0, 1.5, -1.33]}
+            transform
+            distanceFactor={1}
+            wrapperClass="test"
+          >
+            <div className="bg-blue-400 rounded-[20px] p-3 h-[800px] w-[1000px] text-3xl">
+              <h1 className="text-6xl">TSRETSET</h1>
+            </div>
+          </Html>
+        )}
+      </Laptop>
     </group>
   );
 });
@@ -320,6 +333,7 @@ const Laptop = forwardRef(function Laptop(
   const { nodes, materials } = useGLTF("/laptop.gltf") as any;
   return (
     <group ref={ref} {...props} dispose={null}>
+      {props.children}
       <group position={[0, 0.52, 0]} scale={0.1}>
         <mesh
           castShadow
