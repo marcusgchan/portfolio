@@ -31,11 +31,7 @@ function App() {
   const { view } = useViewStates((state) => state);
   return (
     <div className="flex max-w-7xl mx-auto flex-col h-full p-6 relative text-white">
-      <div
-        className={`absolute ${
-          view !== "PROJECTS" ? "-z-10" : "z-10"
-        } left-0 top-0 h-full w-full transition-all`}
-      >
+      <div className={`absolute left-0 top-0 h-full w-full transition-all`}>
         <Canvas shadows camera={{ position: [0, 1.5, 5], zoom: 1, fov: 75 }}>
           <Scene />
           <color attach="background" args={["#27272a"]} />
@@ -108,6 +104,21 @@ function Overlay() {
           </button>
         </div>
       </motion.div>
+      <motion.div
+        animate={
+          view === "PROJECTS"
+            ? { left: "10%", opacity: 1 }
+            : { left: "0", translateX: "-100%", opacity: 0 }
+        }
+        className="absolute left-[5%] top-[5%]"
+      >
+        <button
+          onClick={() => updateView("HOME")}
+          className="p-2 w-[140px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
+        >
+          Home
+        </button>
+      </motion.div>
     </>
   );
 }
@@ -146,28 +157,43 @@ function Home() {
 function Scene() {
   const view = useViewStates((state) => state.view);
   const deskRef = createRef<THREE.Group>();
-  let startTime: null | number = null;
-  const totalTime = 2 * 1000;
+  const clockRef = useRef(new THREE.Clock(false));
+  const totalTime = 2;
   const viewConfig: { [key: string]: Vector3 } = {
     home: new THREE.Vector3(0, -1, -2.5),
     about: new THREE.Vector3(0, -1, -2.5),
-    projects: new THREE.Vector3(0, 0, 3.5),
+    projects: new THREE.Vector3(0, -0, 3.5),
   };
   useFrame(() => {
     if (deskRef.current) {
-      let currentDeskDistance = deskRef.current.position;
+      let currentPosition = deskRef.current.position.clone();
       const targetPosition = viewConfig[view.toLowerCase()];
-      if (!currentDeskDistance.equals(targetPosition)) {
-        if (startTime === null) {
-          startTime = Date.now();
+      const distance = currentPosition.distanceTo(targetPosition);
+      if (distance > 0.0001) {
+        if (!clockRef.current.running) {
+          console.log("STarting Clock");
+          clockRef.current.start();
         }
-        const elapsedTime = Date.now() - startTime;
+        const elapsedTime = clockRef.current.getElapsedTime();
         const progress = Math.min(1, elapsedTime / totalTime);
+        deskRef.current.position.lerpVectors(
+          currentPosition,
+          targetPosition,
+          progress
+        );
         console.log(progress);
-        deskRef.current.position.lerp(targetPosition, progress);
         if (progress === 1) {
-          startTime = null;
+          console.log("stopping clock");
+          clockRef.current.stop();
+          deskRef.current.position.set(
+            targetPosition.x,
+            targetPosition.y,
+            targetPosition.z
+          );
         }
+      } else if (clockRef.current.running) {
+        console.log("Stop clock");
+        clockRef.current.stop();
       }
     }
   });
