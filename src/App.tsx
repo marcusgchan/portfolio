@@ -220,7 +220,7 @@ function HandleHeadings() {
     home: new THREE.Vector3(-width / 2 + homeMargin, 1, 0),
     about: new THREE.Vector3(
       -width / 2 + aboutMargin,
-      height / 2 - aboutMargin - 0.5,
+      height / 2 - aboutMargin - 0.2,
       0
     ),
   };
