@@ -119,6 +119,7 @@ function Overlay() {
           Home
         </button>
       </motion.div>
+      <a href="/style-guide.html" target="_blank" rel="noopener noreferrer" className="absolute left-[1%] bottom-[1%] opacity-50 cursor-pointer">Style Guide</a>
     </>
   );
 }
@@ -146,9 +147,9 @@ function Home() {
         <button className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]">
           Contact
         </button>
-        <button className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]">
+        <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="text-center p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]">
           Download Resume
-        </button>
+        </a>
       </motion.div>
     </>
   );
