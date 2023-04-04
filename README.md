@@ -17,8 +17,7 @@
 
 - Make sure npm is installed
 - Clone project
-
-Run: ```npm i && npm run dev```
+- Run: ```npm i && npm run dev```
 
 ## Assets
 
