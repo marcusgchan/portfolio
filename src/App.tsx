@@ -1,36 +1,34 @@
 import {
+  createContext,
   createRef,
   ForwardedRef,
   forwardRef,
+  useContext,
   useLayoutEffect,
   useRef,
   useState,
 } from "react";
 import "./App.css";
 import * as THREE from "three";
-import colors from "tailwindcss/colors";
 /* https://docs.pmnd.rs/react-three-fiber/getting-started/introduction */
 import { Canvas, GroupProps, useFrame, useThree } from "@react-three/fiber";
 import {
-  BBAnchor,
   Center,
   Float,
   Html,
   Loader,
   OrbitControls,
-  Stage,
   Text3D,
   useGLTF,
-  useMatcapTexture,
 } from "@react-three/drei";
 import { useViewStates } from "./viewStateStore";
-import { BoxGeometry, Vector3 } from "three";
+import { Vector3 } from "three";
 import { motion } from "framer-motion";
 import Desk from "./Desk";
 import Laptop from "./Laptop";
+import Phone from "./Phone";
 
 function App() {
-  const { view } = useViewStates((state) => state);
   return (
     <div className="flex max-w-7xl mx-auto flex-col h-full p-6 relative text-white">
       <div className={`absolute left-0 top-0 h-full w-full transition-all`}>
@@ -164,7 +162,7 @@ function Scene() {
   const viewConfig: { [key: string]: Vector3 } = {
     home: new THREE.Vector3(0, -1, -2.5),
     about: new THREE.Vector3(0, -1, -2.5),
-    projects: new THREE.Vector3(0, -0, 3.5),
+    projects: new THREE.Vector3(0, -0, 3.6),
   };
   useFrame(() => {
     if (deskRef.current) {
@@ -273,28 +271,63 @@ const DeskSetup = forwardRef(function DeskSetup(
   props: GroupProps,
   ref: ForwardedRef<THREE.Group>
 ) {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  useLayoutEffect(() => {
+    const handleResize = () => setIsMobile(() => window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   const view = useViewStates((state) => state.view);
   return (
     <group ref={ref} {...props} scale={[0.3, 0.3, 0.3]}>
       <Desk scale={[1, 1, 1]} rotation-y={Math.PI * 0.5} />
-      <Laptop position={[0, 6.9, 2]} scale={[1.5, 1.5, 1.5]}>
-        {view === "PROJECTS" && (
-          <Html
-            rotation-x={Math.PI * -0.085}
-            position={[0, 1.53, -1.32]}
-            transform
-            distanceFactor={1}
-            wrapperClass="test"
-          >
-            <LaptopBackground>
-              <LaptopScreen />
-            </LaptopBackground>
-          </Html>
-        )}
-      </Laptop>
+      {isMobile ? (
+        <Phone rotation-x={Math.PI * -0.09} position={[-0.17, 8, 2]} scale={[1, 1, 1]}>
+          {view === "PROJECTS" && (
+            <Html
+              position={[0.165, 1.33, 0.06]}
+              transform
+              distanceFactor={1}
+            >
+              <PhoneBackground>
+                <LaptopScreen />
+              </PhoneBackground>
+            </Html>
+          )}
+        </Phone>
+      ) : (
+        <Laptop position={[0, 6.9, 2]} scale={[1.5, 1.5, 1.5]}>
+          {view === "PROJECTS" && (
+            <Html
+              rotation-x={Math.PI * -0.085}
+              position={[0, 1.53, -1.32]}
+              transform
+              distanceFactor={1}
+            >
+              <LaptopBackground>
+                <LaptopScreen />
+              </LaptopBackground>
+            </Html>
+          )}
+        </Laptop>
+      )}
     </group>
   );
 });
+
+function PhoneBackground({ children }: { children: React.ReactNode }) {
+  const backgroundRef = useRef<HTMLDivElement | null>(null);
+  return (
+    <BackgroundElementContext.Provider value={backgroundRef.current}>
+      <div
+        ref={backgroundRef}
+        className="bg-gray-400 overflow-y-auto rounded-[85px] leading-relaxed px-16 py-12 h-[1290px] w-[610px] text-3xl"
+      >
+        {children}
+      </div>
+    </BackgroundElementContext.Provider>
+  );
+}
 
 type LaptopViews = "PROJECTS" | "RECI_ONE" | "VR_SPEECH_SIMULATOR";
 
@@ -307,12 +340,19 @@ function LaptopScreen() {
   }
   return <VrSpeechSimulator setView={setView} />;
 }
-
+const BackgroundElementContext = createContext<null | HTMLDivElement>(null);
+const useBackgroungElement = () => useContext(BackgroundElementContext);
 function LaptopBackground({ children }: { children: React.ReactNode }) {
+  const backgroundRef = useRef<HTMLDivElement | null>(null);
   return (
-    <div className="bg-gray-400 overflow-y-auto rounded-[35px] leading-relaxed px-16 py-12 h-[810px] w-[1185px] text-3xl">
-      {children}
-    </div>
+    <BackgroundElementContext.Provider value={backgroundRef.current}>
+      <div
+        ref={backgroundRef}
+        className="bg-gray-400 overflow-y-auto rounded-[35px] leading-relaxed px-16 py-12 h-[810px] w-[1185px] text-3xl"
+      >
+        {children}
+      </div>
+    </BackgroundElementContext.Provider>
   );
 }
 type SetViewProp = {
@@ -356,6 +396,10 @@ function Projects({ setView }: SetViewProp) {
 }
 
 function VrSpeechSimulator({ setView }: SetViewProp) {
+  const bgElement = useBackgroungElement();
+  useLayoutEffect(() => {
+    bgElement?.scrollTo({ top: 0 });
+  }, []);
   return (
     <section className="flex flex-col gap-6">
       <button
@@ -364,11 +408,87 @@ function VrSpeechSimulator({ setView }: SetViewProp) {
       >
         Back
       </button>
+      <h1 className="text-7xl">VR Speech Simulator - NwHacks 2023 Winners</h1>
+      <h2 className="text-4xl">Description</h2>
+      <p>
+        VR Speech Simulator is a public speaking simulator where users can
+        import their script to practice in a VR classroom. After the
+        presentation, the speech statistics like number of filler words used and
+        WPM are displayed on the screen.
+      </p>
+      <h2 className="text-4xl">Technologies Used</h2>
+      <span>
+        T3-Stack (Nextjs, Prisma, NextAuth, tRPC) + React Three Fiber + ReactXR
+        + React Speech To Text
+      </span>
+      <h2 className="text-4xl">Workflow</h2>
+      <p>
+        To get started, users must login on their laptop. After loggin in, users
+        can import their script and queue a presentation. Once a presentation is
+        queued, it is time to put on the VR headset and login with the same
+        account as the laptop. Since a presentation is queued, it will bring the
+        user to the page with an enter VR button. Clicking the button will bring
+        the user into a classroom with their imported script on the whiteboard.
+        The timer starts immediately. When the user is done presention, they can
+        exit the scene and go on their laptop and the statistics should be
+        there. Some of the stats includes how the time compared with the ideal
+        time that was keyed in initially, WPM, how many filler words were used,
+        and which of theses stats can be improved. Users can practice multiple
+        times and all the results will be shown.
+      </p>
+      <h2 className="text-4xl">3 Main Roadblocks</h2>
+      <p>
+        There were 3 main problems that my team ran into. The first problems was
+        how to communicate from client to client (Laptop to VR headset). The
+        second problem was how to display the script in VR, and the final
+        problem was how to implement the statistics.
+      </p>
+      <h2 className="text-4xl">Client to Client Communication</h2>
+      <p>
+        The main issue with the normal request response pattern is the client
+        always has to initiate the request. The server can't initiate the
+        request. This was a problem because queuing the presentation on the
+        laptop should initialize the VR headset (client) with the queued
+        presentation. Also, we needed the laptop to display the statistics after
+        the presentation was over (VR headset to laptop).
+      </p>
+      <p>
+        After debating between websockets, bluetooth, and polling, we decided to
+        go with the naive solution of polling due to time constraints.
+        Basically, the VR headset will ask the server "Is there a presentation
+        queued?" every 5 seconds and the laptop will ask the server "Is there a
+        presentation that is finished?" every 5 seconds.
+      </p>
+      <p>
+        Another reason why we didn't go with websockets was we had a serverless
+        deploy on Vercel so we would need a third party solution like Pusher
+        which we didn't have time to figure.
+      </p>
+      <h2 className="text-4xl">Displaying Text in the Scene</h2>
+      <p>
+        Drei provides a text component which is a wrapper around troika-text-3d.
+        We used that to display the imported text on the whiteboard.
+      </p>
+      <img src="/vr-speech-simulator/script-on-whiteboard.png" />
+      <h2 className="text-4xl">Statistics Pipeline</h2>
+      <p>
+        We used react speech to text (wrapper around the web speech api) to get
+        a transcript of what there users says. Then we will send the trasncript
+        to the backend for processing. We have a table of filler words and
+        iterated through the transcript and counted the number of filler words.
+        Then we used the start and end time to calculate the total time of the
+        presentation and sent it back to the frontend.
+      </p>
+      <img src="/vr-speech-simulator/attempts.png" />
     </section>
   );
 }
 
 function ReciOne({ setView }: SetViewProp) {
+  const bgElement = useBackgroungElement();
+  useLayoutEffect(() => {
+    bgElement?.scrollTo({ top: 0 });
+  }, []);
   return (
     <section className="flex flex-col gap-6">
       <button
@@ -467,21 +587,7 @@ function ReciOne({ setView }: SetViewProp) {
   );
 }
 
-function Nav({ toggleDisplay3dScene }: { toggleDisplay3dScene: () => void }) {
-  return (
-    <nav>
-      <ul className="flex justify-end gap-3 max-w-5xl mx-auto">
-        <li>
-          <button onClick={toggleDisplay3dScene}>Home</button>
-        </li>
-        <li>
-          <button>Contact</button>
-        </li>
-      </ul>
-    </nav>
-  );
-}
-
 export default App;
 useGLTF.preload("./laptop.gltf");
 useGLTF.preload("./table.glb");
+useGLTF.preload("./phone.gltf");
