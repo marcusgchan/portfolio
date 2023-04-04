@@ -12,6 +12,14 @@
 - Threejs
 - Drei
 
+
+## How to run
+
+- Make sure npm is installed
+- Clone project
+
+Run: ```npm i && npm run dev```
+
 ## Assets
 
 - Table by jeremy [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/8cnrwlAWqx7)
