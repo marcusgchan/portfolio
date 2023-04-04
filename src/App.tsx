@@ -305,7 +305,7 @@ function LaptopScreen() {
   } else if (view === "RECI_ONE") {
     return <ReciOne setView={setView} />;
   }
-  return null;
+  return <VrSpeechSimulator setView={setView} />;
 }
 
 function LaptopBackground({ children }: { children: React.ReactNode }) {
@@ -355,6 +355,19 @@ function Projects({ setView }: SetViewProp) {
   );
 }
 
+function VrSpeechSimulator({ setView }: SetViewProp) {
+  return (
+    <section className="flex flex-col gap-6">
+      <button
+        onClick={() => setView("PROJECTS")}
+        className="sticky top-0 p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
+      >
+        Back
+      </button>
+    </section>
+  );
+}
+
 function ReciOne({ setView }: SetViewProp) {
   return (
     <section className="flex flex-col gap-6">
@@ -387,12 +400,14 @@ function ReciOne({ setView }: SetViewProp) {
         I spent a lot of time setting up this development enviornment that is
         overkill for my current scale, but the main reason I did it was to
         practice what I learned during my coop. Two commands are requried to run
-        the development enviroment. <code className="bg-gray-500 p-1 rounded">npx run dev</code> which starts up the
-        Nextjs server and <code className="bg-gray-500 p-1 rounded">docker compose up</code> which runs the
-        database, minio, and recipe parser containers. In the future, I may move
-        Nextjs to startup with docker but I am satisified for now. In addition,
-        I have protected main branch and a CI pipeline that currently runs
-        Prettier, ESLint, and building test.
+        the development enviroment.{" "}
+        <code className="bg-gray-500 p-1 rounded">npx run dev</code> which
+        starts up the Nextjs server and{" "}
+        <code className="bg-gray-500 p-1 rounded">docker compose up</code> which
+        runs the database, minio, and recipe parser containers. In the future, I
+        may move Nextjs to startup with docker but I am satisified for now. In
+        addition, I have protected main branch and a CI pipeline that currently
+        runs Prettier, ESLint, and building test.
       </p>
       <p>
         Using docker allows for an easy development setup when working with
