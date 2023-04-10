@@ -3,6 +3,7 @@
 - 3D portfolio website to experiment with WebGL technologies
 - Inspired by: [Mixing HTML and WebGL](https://codesandbox.io/s/9keg6), [button animations](https://codesandbox.io/s/ioxywi), [zooming in and out](https://guillaumegouessan.com/)
 - Used [typeface.js generator](http://gero3.github.io/facetype.js/) to generate typeface.js font
+- Project was initialized with vite
 
 ## Libraries
 
