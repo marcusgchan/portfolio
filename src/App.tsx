@@ -13,11 +13,9 @@ import * as THREE from "three";
 import { Canvas, GroupProps, useFrame, useThree } from "@react-three/fiber";
 import {
   Center,
-  Float,
   Html,
   Loader,
   OrbitControls,
-  Text3D,
   useGLTF,
 } from "@react-three/drei";
 import { useViewStates } from "./viewStateStore";
@@ -51,13 +49,12 @@ function OverlayWrapper({ children }: { children: React.ReactNode }) {
 }
 
 function Overlay() {
-  const view = useViewStates((state) => state.view);
-  const updateView = useViewStates((state) => state.updateView);
   return (
     <>
       <Home />
       <About />
       <Projects />
+      <Contact />
       <a
         href="/style-guide.html"
         target="_blank"
@@ -77,28 +74,31 @@ function Home() {
     <>
       <motion.div
         initial={{
-          top: "10%",
+          top: "20vmin",
           left: "0",
           translateX: "-100%",
         }}
         animate={
           view === "HOME"
             ? {
-                left: "10%",
-                top: "10%",
+                left: "15vmin",
+                top: "20vmin",
                 translateX: "0",
                 opacity: 1,
               }
             : {
-                left: "0%",
-                top: "10%",
+                left: "0",
+                top: "20vim",
                 translateX: "-100%",
                 opacity: 0,
               }
         }
         className="absolute"
       >
-        <h1 className="text-6xl">Hi, my name is Marcus.</h1>
+        <h1 className="text-6xl">
+          Hi, my name is
+          <br /> Marcus.
+        </h1>
       </motion.div>
       <motion.div
         initial={{ right: "0", bottom: "10%" }}
@@ -115,7 +115,10 @@ function Home() {
         >
           Explore
         </button>
-        <button className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]">
+        <button
+          onClick={() => updateView("CONTACT")}
+          className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
+        >
           Contact
         </button>
         <a
@@ -135,57 +138,142 @@ function About() {
   const updateView = useViewStates((state) => state.updateView);
   const view = useViewStates((state) => state.view);
   return (
+    <>
+      <motion.div
+        initial={{
+          top: "20vmin",
+          left: "0",
+          translateX: "-100%",
+        }}
+        animate={
+          view === "ABOUT"
+            ? {
+                left: "15vmin",
+                top: "20vmin",
+                translateX: "0",
+                opacity: 1,
+              }
+            : {
+                left: "0",
+                top: "20vim",
+                translateX: "-100%",
+                opacity: 0,
+              }
+        }
+        className="absolute"
+      >
+        <h1 className="text-6xl">Bio</h1>
+      </motion.div>
+      <motion.div
+        initial={{
+          right: "0",
+          bottom: "10%",
+          translateX: "100%",
+          opacity: 0,
+        }}
+        animate={
+          view === "ABOUT"
+            ? { right: "10%", translateX: "0", opacity: 1 }
+            : { right: "0%", translateX: "100%", opacity: 0 }
+        }
+        className="absolute p-2 ml-[10%] flex flex-col max-w-lg gap-4 tracking-wide"
+      >
+        <div className="flex flex-col gap-4 overflow-auto max-h-[50vh] md:max-h-none">
+          <p>
+            Hello, I’m Marcus and I am studying Computer Science - Software
+            Systems at SFU. My passion lies in web development, and I've been
+            honing my skills in this area for some time now. In 2022, I joined
+            WelTel Health as a fullstack developer intern and had the
+            opportunity to improve after clinic healthcare through fixing bugs
+            and developing features. One of my main takeaways was learning how
+            to work in a large code base.
+          </p>
+          <p>
+            My favourite tech stack is the T3 Stack that focuses on fullstack
+            type safety for web development. This stack has tremendously
+            improved my productivity and has best in class developer experience.
+            Additionally, I've recently been exploring the possibilities of
+            WebXR and WebGL, which I find to be fascinating technologies that
+            offer new and exciting ways to create immersive web experiences.
+          </p>
+          <p>
+            Overall, I am passionate about software development and excited to
+            continue learning and growing in this field.
+          </p>
+        </div>
+        <div className="flex gap-3 md:gap-14">
+          <button
+            onClick={() => updateView("HOME")}
+            className="p-2 w-[140px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
+          >
+            Back
+          </button>
+          <button
+            onClick={() => updateView("PROJECTS")}
+            className="p-2 w-[140px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
+          >
+            Projects
+          </button>
+        </div>
+      </motion.div>
+    </>
+  );
+}
+
+function Contact() {
+  const view = useViewStates((state) => state.view);
+  const updateView = useViewStates((state) => state.updateView);
+  const back = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateView("HOME");
+  };
+  const send = (e: React.FormEvent) => {
+    e.preventDefault();
+  };
+  return (
     <motion.div
-      initial={{
-        right: "0",
-        bottom: "10%",
-        translateX: "100%",
-        opacity: 0,
-      }}
       animate={
-        view === "ABOUT"
-          ? { right: "10%", translateX: "0", opacity: 1 }
-          : { right: "0%", translateX: "100%", opacity: 0 }
+        view === "CONTACT"
+          ? {
+              opacity: 1,
+              translateY: 0,
+              zIndex: 0,
+            }
+          : {
+              opacity: 0,
+              translateY: 50,
+              zIndex: -999,
+            }
       }
-      className="absolute p-2 ml-[10%] flex flex-col max-w-lg gap-4 tracking-wide"
+      className="absolute h-full w-full flex justify-center items-center"
     >
-      <div className="flex flex-col gap-4 overflow-auto max-h-[50vh] md:max-h-none">
-        <p>
-          Hello, I’m Marcus and I am studying Computer Science - Software
-          Systems at SFU. My passion lies in web development, and I've been
-          honing my skills in this area for some time now. In 2022, I joined
-          WelTel Health as a fullstack developer intern and had the opportunity
-          to improve after clinic healthcare through fixing bugs and developing
-          features. One of my main takeaways was learning how to work in a large
-          code base.
-        </p>
-        <p>
-          My favourite tech stack is the T3 Stack that focuses on fullstack type
-          safety for web development. This stack has tremendously improved my
-          productivity and has best in class developer experience. Additionally,
-          I've recently been exploring the possibilities of WebXR and WebGL,
-          which I find to be fascinating technologies that offer new and
-          exciting ways to create immersive web experiences.
-        </p>
-        <p>
-          Overall, I am passionate about software development and excited to
-          continue learning and growing in this field.
-        </p>
-      </div>
-      <div className="flex gap-3 md:gap-14">
-        <button
-          onClick={() => updateView("HOME")}
-          className="p-2 w-[140px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
-        >
-          Back
-        </button>
-        <button
-          onClick={() => updateView("PROJECTS")}
-          className="p-2 w-[140px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
-        >
-          Projects
-        </button>
-      </div>
+      <aside className="flex flex-col max-w-md w-full gap-4 border-violet-400 border-4 rounded p-4">
+        <h1 className="text-2xl">Contact Me</h1>
+        <form className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1 w-full">
+            <label className="block">Email:</label>
+            <input className="bg-transparent border-gray-500 border-2 p-1" />
+          </div>
+          <div className="flex flex-col gap-1 w-full">
+            <label className="block">Message:</label>
+            <textarea className="bg-transparent border-gray-500 border-2 p-1" />
+          </div>
+          <div className="flex gap-4">
+            <button
+              onClick={back}
+              className="p-2 w-[120px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.red.400)] hover:shadow-[inset_150px_0_0_9px_theme(colors.red.400)]"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={send}
+              className="p-2 w-[120px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_150px_0_0_9px_theme(colors.violet.400)]"
+            >
+              Send
+            </button>
+          </div>
+        </form>
+      </aside>
     </motion.div>
   );
 }
@@ -198,7 +286,7 @@ function Projects() {
       initial={{ top: "5%", left: "0", translateX: "-100%" }}
       animate={
         view === "PROJECTS"
-          ? { left: "10%", opacity: 1 }
+          ? { left: "10%", translateX: "0", opacity: 1 }
           : { left: "0", translateX: "-100%", opacity: 0 }
       }
       className="absolute left-[5%] top-[5%]"
@@ -218,9 +306,11 @@ function Scene() {
   const deskRef = createRef<THREE.Group>();
   const clockRef = useRef(new THREE.Clock(false));
   const totalTime = 2;
+  // TODO: Make type more strict to match differ views
   const viewConfig: { [key: string]: Vector3 } = {
     home: new THREE.Vector3(0, -1, -2.5),
     about: new THREE.Vector3(0, -1, -2.5),
+    contact: new THREE.Vector3(0, -1, -4.5),
     projects: new THREE.Vector3(0, -0, 3.6),
   };
   useFrame(() => {
@@ -259,70 +349,6 @@ function Scene() {
       </Center>
     </>
   );
-}
-
-function HandleHeadings() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  useLayoutEffect(() => {
-    const handleResize = () => setIsMobile(() => window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-  const homeMargin = isMobile ? 0.8 : 1.3;
-  const aboutMargin = isMobile ? 0.9 : 2;
-  const view = useViewStates((state) => state.view);
-  const { width, height } = useThree((state) => state.viewport);
-  const positionBasedOnView = {
-    home: new THREE.Vector3(-width / 2 + homeMargin, 1, 0),
-    about: new THREE.Vector3(
-      -width / 2 + aboutMargin,
-      height / 2 - aboutMargin - 0.2,
-      0
-    ),
-  };
-  const textBasedOnView = {
-    home: `Hi, my name\nis Marcus`,
-    about: `Bio`,
-  };
-  const textBaseConfig = {
-    rotation: new THREE.Euler(-0.1, 0.3, 0),
-    letterSpacing: 0.03,
-    curveSegments: 32,
-    bevelEnabled: true,
-    lineHeight: 0.8,
-    bevelThickness: 0.1,
-    height: 0.1,
-    font: "/Roboto_Regular.json",
-  };
-  if (view === "HOME") {
-    return (
-      <>
-        <Float rotationIntensity={0.0}>
-          <Center right position={positionBasedOnView.home}>
-            <Text3D size={isMobile ? 0.3 : 0.4} {...textBaseConfig}>
-              {textBasedOnView.home}
-              <meshNormalMaterial />
-            </Text3D>
-          </Center>
-        </Float>
-      </>
-    );
-  }
-  if (view === "ABOUT") {
-    return (
-      <>
-        <Float rotationIntensity={0.0}>
-          <Center bottom right position={positionBasedOnView.about}>
-            <Text3D {...textBaseConfig} size={0.5}>
-              {textBasedOnView.about}
-              <meshNormalMaterial />
-            </Text3D>
-          </Center>
-        </Float>
-      </>
-    );
-  }
-  return null;
 }
 
 const DeskSetup = forwardRef(function DeskSetup(
@@ -376,7 +402,7 @@ const DeskSetup = forwardRef(function DeskSetup(
 function PhoneBackground({ children }: { children: React.ReactNode }) {
   const backgroundRef = useRef<HTMLDivElement | null>(null);
   return (
-    <BackgroundElementContext.Provider value={backgroundRef.current}>
+    <BackgroundElementContext.Provider value={backgroundRef}>
       <div
         ref={backgroundRef}
         className="bg-gray-400 overflow-y-auto rounded-[85px] leading-relaxed px-16 py-12 h-[1290px] w-[610px] text-3xl"
@@ -398,12 +424,13 @@ function LaptopScreen() {
   }
   return <VrSpeechSimulator setView={setView} />;
 }
-const BackgroundElementContext = createContext<null | HTMLDivElement>(null);
+const BackgroundElementContext =
+  createContext<null | React.RefObject<HTMLDivElement>>(null);
 const useBackgroungElement = () => useContext(BackgroundElementContext);
 function LaptopBackground({ children }: { children: React.ReactNode }) {
   const backgroundRef = useRef<HTMLDivElement | null>(null);
   return (
-    <BackgroundElementContext.Provider value={backgroundRef.current}>
+    <BackgroundElementContext.Provider value={backgroundRef}>
       <div
         ref={backgroundRef}
         className="bg-gray-400 overflow-y-auto rounded-[35px] leading-relaxed px-16 py-12 h-[810px] w-[1185px] text-3xl"
@@ -456,7 +483,7 @@ function ProjectsView({ setView }: SetViewProp) {
 function VrSpeechSimulator({ setView }: SetViewProp) {
   const bgElement = useBackgroungElement();
   useLayoutEffect(() => {
-    bgElement?.scrollTo({ top: 0 });
+    bgElement?.current?.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
   return (
     <section className="flex flex-col gap-6">
@@ -545,7 +572,7 @@ function VrSpeechSimulator({ setView }: SetViewProp) {
 function ReciOne({ setView }: SetViewProp) {
   const bgElement = useBackgroungElement();
   useLayoutEffect(() => {
-    bgElement?.scrollTo({ top: 0 });
+    bgElement?.current?.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
   return (
     <section className="flex flex-col gap-6">
