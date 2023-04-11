@@ -23,5 +23,9 @@
 ## Assets
 
 - Table by jeremy [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/8cnrwlAWqx7)
-- Laptop from [pmndrs market](https://market.pmnd.rs/model/macbook)
-- Phone from [pmndrs market](https://market.pmnd.rs/model/iphone-x)
+- [Laptop] (https://market.pmnd.rs/model/macbook) from pmndrs market
+- Phone from [pmndrs market] (https://market.pmnd.rs/model/iphone-x)
+- [Light Stand] (https://poly.pizza/m/8LiDIfXVLi) by Quarternius 
+- Modern rug by jeremy [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/d1qCwgKV7se)
+- [Plant] (https://market.pmnd.rs/model/plant) from pmndrs market
+- [Drink] (https://market.pmnd.rs/model/plant) from pmndrs market

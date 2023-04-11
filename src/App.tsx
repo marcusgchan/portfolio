@@ -18,6 +18,7 @@ import {
   Loader,
   OrbitControls,
   useGLTF,
+  useHelper,
 } from "@react-three/drei";
 import { useViewStates } from "./viewStateStore";
 import { Vector3 } from "three";
@@ -28,6 +29,7 @@ import Phone from "./Phone";
 import Plant from "./Plant";
 import Drink from "./Drink";
 import { Rug } from "./Rug";
+import { LightStand } from "./LightStand";
 
 function App() {
   return (
@@ -39,6 +41,8 @@ function App() {
           <fogExp2 color="#27272a" density={0.2} attach="fog" />
           <ambientLight intensity={0.5} color="white" />
           <Environment preset="city" />
+          <OrbitControls />
+          <gridHelper />
         </Canvas>
       </div>
       <OverlayWrapper>
@@ -314,7 +318,7 @@ function Scene() {
   // TODO: Make type more strict to match differ views
   const viewConfig: { [key: string]: Vector3 } = {
     home: new THREE.Vector3(0, -1, -2.5),
-    about: new THREE.Vector3(0, -1, -2.5),
+    about: new THREE.Vector3(0, -1, -1),
     contact: new THREE.Vector3(0, -1, -4.5),
     projects: new THREE.Vector3(0, -0, 3.6),
   };
@@ -367,12 +371,16 @@ const DeskSetup = forwardRef(function DeskSetup(
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   const view = useViewStates((state) => state.view);
+  const light = useRef<THREE.PointLight>(null);
+  //useHelper(light, THREE.PointLightHelper, 5);
   return (
     <group ref={ref} {...props} scale={[0.3, 0.3, 0.3]}>
       <Desk scale={[1, 1, 1]} rotation-y={Math.PI * 0.5} />
-      <Plant position={[-6.5, 8, 0]} />
-      <Drink position={[6, 8, 1.5]} scale={[5, 5, 5]} />
+      <Plant position={[-6.5, 7.9, 0]} />
+      <Drink position={[6, 7.55, 0]} scale={[5, 5, 5]} />
       <Rug rotation-y={Math.PI * 0.5} scale={[3, 1, 2.5]} />
+      <LightStand position={[10.7, 0, -7]} scale={[4, 4, 4]} />
+      <pointLight ref={light} position={[10, 10, -5]} args={["#FFFFE0", 5, 100]}/>
       {isMobile ? (
         <Phone
           rotation-x={Math.PI * -0.09}
@@ -687,3 +695,4 @@ useGLTF.preload("./phone.gltf");
 useGLTF.preload("./drink.gltf");
 useGLTF.preload("./plant.gltf");
 useGLTF.preload("./rug.glb");
+useGLTF.preload("/light-stand.glb");
