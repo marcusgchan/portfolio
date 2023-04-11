@@ -8,6 +8,7 @@ export default function Desk(props: GroupProps) {
   const { nodes, materials } = useGLTF("/table.glb") as any;
   return (
     <group {...props} dispose={null}>
+      {props.children}
       <mesh
         castShadow
         receiveShadow

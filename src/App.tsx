@@ -13,6 +13,7 @@ import * as THREE from "three";
 import { Canvas, GroupProps, useFrame, useThree } from "@react-three/fiber";
 import {
   Center,
+  Environment,
   Html,
   Loader,
   OrbitControls,
@@ -24,6 +25,9 @@ import { motion } from "framer-motion";
 import Desk from "./Desk";
 import Laptop from "./Laptop";
 import Phone from "./Phone";
+import Plant from "./Plant";
+import Drink from "./Drink";
+import { Rug } from "./Rug";
 
 function App() {
   return (
@@ -34,6 +38,7 @@ function App() {
           <color attach="background" args={["#27272a"]} />
           <fogExp2 color="#27272a" density={0.2} attach="fog" />
           <ambientLight intensity={0.5} color="white" />
+          <Environment preset="city" />
         </Canvas>
       </div>
       <OverlayWrapper>
@@ -365,6 +370,9 @@ const DeskSetup = forwardRef(function DeskSetup(
   return (
     <group ref={ref} {...props} scale={[0.3, 0.3, 0.3]}>
       <Desk scale={[1, 1, 1]} rotation-y={Math.PI * 0.5} />
+      <Plant position={[-6.5, 8, 0]} />
+      <Drink position={[6, 8, 1.5]} scale={[5, 5, 5]} />
+      <Rug rotation-y={Math.PI * 0.5} scale={[3, 1, 2.5]} />
       {isMobile ? (
         <Phone
           rotation-x={Math.PI * -0.09}
@@ -676,3 +684,6 @@ export default App;
 useGLTF.preload("./laptop.gltf");
 useGLTF.preload("./table.glb");
 useGLTF.preload("./phone.gltf");
+useGLTF.preload("./drink.gltf");
+useGLTF.preload("./plant.gltf");
+useGLTF.preload("./rug.glb");
