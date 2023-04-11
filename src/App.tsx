@@ -35,11 +35,7 @@ function App() {
   return (
     <div className="flex max-w-7xl mx-auto flex-col h-full p-6 relative text-white">
       <div className={`absolute left-0 top-0 h-full w-full transition-all`}>
-        <Canvas
-          shadows
-          camera={{ position: [0, 1.5, 5], zoom: 1, fov: 75 }}
-          eventSource={document.getElementById("root")!}
-        >
+        <Canvas shadows camera={{ position: [0, 1.5, 5], zoom: 1, fov: 75 }}>
           <Scene />
           <color attach="background" args={["#27272a"]} />
           <fogExp2 color="#27272a" density={0.2} attach="fog" />
