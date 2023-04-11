@@ -35,14 +35,16 @@ function App() {
   return (
     <div className="flex max-w-7xl mx-auto flex-col h-full p-6 relative text-white">
       <div className={`absolute left-0 top-0 h-full w-full transition-all`}>
-        <Canvas shadows camera={{ position: [0, 1.5, 5], zoom: 1, fov: 75 }}>
+        <Canvas
+          shadows
+          camera={{ position: [0, 1.5, 5], zoom: 1, fov: 75 }}
+          eventSource={document.getElementById("root")!}
+        >
           <Scene />
           <color attach="background" args={["#27272a"]} />
           <fogExp2 color="#27272a" density={0.2} attach="fog" />
           <ambientLight intensity={0.5} color="white" />
           <Environment preset="city" />
-          <OrbitControls />
-          <gridHelper />
         </Canvas>
       </div>
       <OverlayWrapper>
@@ -150,31 +152,6 @@ function About() {
     <>
       <motion.div
         initial={{
-          top: "20vmin",
-          left: "0",
-          translateX: "-100%",
-        }}
-        animate={
-          view === "ABOUT"
-            ? {
-                left: "15vmin",
-                top: "20vmin",
-                translateX: "0",
-                opacity: 1,
-              }
-            : {
-                left: "0",
-                top: "20vim",
-                translateX: "-100%",
-                opacity: 0,
-              }
-        }
-        className="absolute"
-      >
-        <h1 className="text-6xl">Bio</h1>
-      </motion.div>
-      <motion.div
-        initial={{
           right: "0",
           bottom: "10%",
           translateX: "100%",
@@ -187,7 +164,8 @@ function About() {
         }
         className="absolute p-2 ml-[10%] flex flex-col max-w-lg gap-4 tracking-wide"
       >
-        <div className="flex flex-col gap-4 overflow-auto max-h-[50vh] md:max-h-none">
+        <h1 className="-m-1 text-6xl">Bio</h1>
+        <div className="flex flex-col gap-4 overflow-y-auto max-h-[50vh] md:max-h-none">
           <p>
             Hello, I’m Marcus and I am studying Computer Science - Software
             Systems at SFU. My passion lies in web development, and I've been
@@ -320,7 +298,7 @@ function Scene() {
     home: new THREE.Vector3(0, -1, -2.5),
     about: new THREE.Vector3(0, -1, -1),
     contact: new THREE.Vector3(0, -1, -4.5),
-    projects: new THREE.Vector3(0, -0, 3.6),
+    projects: new THREE.Vector3(0, 0.2, 3.6),
   };
   useFrame(() => {
     if (deskRef.current) {
@@ -380,7 +358,11 @@ const DeskSetup = forwardRef(function DeskSetup(
       <Drink position={[6, 7.55, 0]} scale={[5, 5, 5]} />
       <Rug rotation-y={Math.PI * 0.5} scale={[3, 1, 2.5]} />
       <LightStand position={[10.7, 0, -7]} scale={[4, 4, 4]} />
-      <pointLight ref={light} position={[10, 10, -5]} args={["#FFFFE0", 5, 100]}/>
+      <pointLight
+        ref={light}
+        position={[10, 10, -5]}
+        args={["#FFFFE0", 5, 100]}
+      />
       {isMobile ? (
         <Phone
           rotation-x={Math.PI * -0.09}
