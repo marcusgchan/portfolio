@@ -19,6 +19,7 @@ import {
   OrbitControls,
   useGLTF,
   useHelper,
+  useProgress,
 } from "@react-three/drei";
 import { useViewStates } from "./viewStateStore";
 import { Vector3 } from "three";
@@ -52,7 +53,11 @@ function App() {
 }
 
 function OverlayWrapper({ children }: { children: React.ReactNode }) {
-  return <div className="fixed inset-0">{children}</div>;
+  const isLoading = useProgress((state) => state.active);
+  if (!isLoading) {
+    return <div className="fixed inset-0">{children}</div>;
+  }
+  return null;
 }
 
 function Overlay() {
@@ -215,6 +220,7 @@ function Contact() {
   };
   return (
     <motion.div
+      initial={false}
       animate={
         view === "CONTACT"
           ? {
@@ -294,6 +300,7 @@ function Scene() {
     home: new THREE.Vector3(0, -1, -2.5),
     about: new THREE.Vector3(0, -1, -1),
     contact: new THREE.Vector3(0, -1, -4.5),
+    expanded: new THREE.Vector3(0, 0.2, 3.6),
     projects: new THREE.Vector3(0, 0.2, 3.6),
   };
   useFrame(() => {
@@ -366,7 +373,7 @@ const DeskSetup = forwardRef(function DeskSetup(
           scale={[1, 1, 1]}
         >
           {view === "PROJECTS" && (
-            <Html position={[0.165, 1.33, 0.06]} transform distanceFactor={1}>
+            <Html position={[0.165, 1.33, 0.06]} scale={[1, 1.015, 1]} transform distanceFactor={1}>
               <PhoneBackground>
                 <LaptopScreen />
               </PhoneBackground>
@@ -399,7 +406,7 @@ function PhoneBackground({ children }: { children: React.ReactNode }) {
     <BackgroundElementContext.Provider value={backgroundRef}>
       <div
         ref={backgroundRef}
-        className="bg-gray-400 overflow-y-auto rounded-[85px] leading-relaxed px-16 py-12 h-[1290px] w-[610px] text-3xl"
+        className="bg-gray-400 overflow-y-auto rounded-[75px] leading-relaxed px-16 py-12 h-[1290px] w-[610px] text-4xl"
       >
         {children}
       </div>
@@ -415,8 +422,10 @@ function LaptopScreen() {
     return <ProjectsView setView={setView} />;
   } else if (view === "RECI_ONE") {
     return <ReciOne setView={setView} />;
+  } else if (view === "VR_SPEECH_SIMULATOR") {
+    return <VrSpeechSimulator setView={setView} />;
   }
-  return <VrSpeechSimulator setView={setView} />;
+  return null;
 }
 const BackgroundElementContext =
   createContext<null | React.RefObject<HTMLDivElement>>(null);
@@ -450,7 +459,7 @@ function ProjectsView({ setView }: SetViewProp) {
           </p>
           <button
             onClick={() => setView("RECI_ONE")}
-            className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
+            className="p-2 w-[200px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
           >
             View More
           </button>
@@ -464,7 +473,7 @@ function ProjectsView({ setView }: SetViewProp) {
           </p>
           <button
             onClick={() => setView("VR_SPEECH_SIMULATOR")}
-            className="p-2 w-[170px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
+            className="p-2 w-[200px] border-white rounded bg-white text-gray-500 hover:text-white hover:scale-[1.1] transition-all shadow-[inset_0_0_0_0_theme(colors.violet.400)] hover:shadow-[inset_250px_0_0_9px_theme(colors.violet.400)]"
           >
             View More
           </button>
