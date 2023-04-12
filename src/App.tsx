@@ -300,7 +300,6 @@ function Scene() {
     home: new THREE.Vector3(0, -1, -2.5),
     about: new THREE.Vector3(0, -1, -1),
     contact: new THREE.Vector3(0, -1, -4.5),
-    expanded: new THREE.Vector3(0, 0.2, 3.6),
     projects: new THREE.Vector3(0, 0.2, 3.6),
   };
   useFrame(() => {
