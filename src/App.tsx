@@ -67,14 +67,6 @@ function Overlay() {
       <About />
       <Projects />
       <Contact />
-      <a
-        href="/style-guide.html"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="absolute left-[1%] bottom-[1%] opacity-50 cursor-pointer"
-      >
-        Style Guide
-      </a>
     </>
   );
 }
@@ -372,7 +364,12 @@ const DeskSetup = forwardRef(function DeskSetup(
           scale={[1, 1, 1]}
         >
           {view === "PROJECTS" && (
-            <Html position={[0.165, 1.33, 0.06]} scale={[1, 1.015, 1]} transform distanceFactor={1}>
+            <Html
+              position={[0.165, 1.33, 0.06]}
+              scale={[1, 1.015, 1]}
+              transform
+              distanceFactor={1}
+            >
               <PhoneBackground>
                 <LaptopScreen />
               </PhoneBackground>
